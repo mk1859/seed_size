@@ -136,7 +136,7 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(cluster))) +
         strip.text.x = element_blank()) + 
   scale_color_manual(values=c("#E15759", "#4E79A7"))
  ```
- <img src="https://github.com/mk1859/seed_size/blob/main/images/cluster_genes.jpeg" width=70% height=70%>
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/clusters_genes.jpeg" width=70% height=70%>
  
  ``` R
   
