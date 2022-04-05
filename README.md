@@ -136,7 +136,7 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(cluster))) +
         strip.text.x = element_blank()) + 
   scale_color_manual(values=c("#E15759", "#4E79A7"))
  ```
- <img src="https://github.com/mk1859/seed_size/blob/main/images/clusters_genes.jpeg" width=70% height=70%>
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/clusters_genes.jpeg" width=30% height=30%>
  
  ``` R
   
@@ -150,23 +150,6 @@ ggplot(deg_dry_dog1 , aes(y=-log10(padj), x= log2FoldChange, color = padj < 0.05
   theme_classic() +
   scale_alpha_ordinal(range = c(0.1, 1))
   
-  
-  
-res <- results(dds, alpha = 0.05, contrast= c("size","S","L"))
-length(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),2])
-nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
-write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/SvL.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
-
-
-res <- results(dds, alpha = 0.05, contrast= c("size","S","M"))
-nrow(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),])
-nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
-write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/SvM.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
-
-res <- results(dds, alpha = 0.05, contrast= c("size","M","L"))
-nrow(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),])
-nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
-write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/MvL.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
 
 ```
 
