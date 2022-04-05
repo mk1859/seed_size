@@ -70,7 +70,8 @@ We identified DEGs using DESeq2.
 
 ``` R
 # metadata
-coldata <- data.frame(lib = colnames(rnaseq_size), size = substr (colnames(rnaseq_size), 1,1), replica = substr (colnames(rnaseq_size), 2,2))
+coldata <- data.frame(lib = colnames(rnaseq_size), size = substr (colnames(rnaseq_size), 1,1), 
+                      replica = substr (colnames(rnaseq_size), 2,2))
 
 # DESeq2 analysis
 dds <- DESeqDataSetFromMatrix(countData = rnaseq_size, colData = coldata, design = ~ size)
