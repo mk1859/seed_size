@@ -4,13 +4,13 @@ Here we provide code for the preparation of the NGS figures for analysis of Arab
 
 ```
 library (DESeq2)
-library (ggplot2)
-library (ggthemes)
-
-
-
 library (tidyverse)
 library (ggthemes)
+library (eulerr)
+library (gprofiler2)
+
+
+
 library (ggbeeswarm)
 library (viridis)
 library (sctransform)
@@ -18,14 +18,14 @@ library (Seurat)
 library (rlist)
 library (cowplot)
 library (patchwork)
-library (gprofiler2)
+
 library (rrvgo)
 library (scran)
 library (scater)
 library (graph)
 library (RBGL)
 library (data.table)
-library (eulerr)
+
 library (DESeq2)
 library (VISION)
 library (org.At.tair.db)
@@ -95,7 +95,13 @@ ggplot(plot , aes(x=PC1, y=PC2, color = size, label = replica)) +
 deg_rnaseq <- list (SvL = results(dds, alpha = 0.05, contrast= c("size","S","L")),
                     SvM = results(dds, alpha = 0.05, contrast= c("size","S","M")),
                     MvL = results(dds, alpha = 0.05, contrast= c("size","M","L")))
- 
+                    
+# plot overlaps between affected genes
+
+```   
+
+
+``` R
 # select affected genes for small vs large seeds comparison
 affected_genes <- rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < 0.05),])
 
@@ -139,8 +145,38 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(cluster))) +
  <img src="https://github.com/mk1859/seed_size/blob/main/images/clusters_genes.jpeg" width=30% height=30%>
  
  ``` R
-  
+# GO term enrichment for affected genes
+background_genes <- rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$baseMean > 5),])
 
+# genes upregulated in small seeds
+plot <- gost(query = rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange > 0),]),
+             organism = "athaliana", custom_bg = background_genes, user_threshold = 0.05, sources = "GO")$result
+
+plot$log_pval <- -log10(plot$p_value)
+plot$term_name <- factor(plot$term_name, levels = as.factor(plot$term_name [order(c(plot$source, plot$log_pval), decreasing = F)]))
+
+ggplot(plot, aes(log_pval, term_name, fill = source)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  theme_classic() + 
+  scale_fill_tableau()
+```  
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/go_small.jpeg" width=30% height=30%> 
+``` R
+# genes upregulated in large seeds
+plot <- gost(query = rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange < 0),]),
+             organism = "athaliana", custom_bg = background_genes, user_threshold = 0.05, sources = "GO")$result
+
+plot$log_pval <- -log10(plot$p_value)
+plot$term_name <- factor(plot$term_name, levels = as.factor(plot$term_name [order(c(plot$source, plot$log_pval), decreasing = F)]))
+
+ggplot(plot, aes(log_pval, term_name, fill = source)) +
+  geom_bar(stat="identity", position=position_dodge()) +
+  theme_classic() + 
+  scale_fill_tableau()
+``` 
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/go_large.jpeg" width=30% height=30%>  
+  
+``` R
 deg_rnaseq <- as.data.frame(results(dds, alpha = 0.05, contrast= c("genotype","dog1","Col0")))
 
 # Volcano plot
