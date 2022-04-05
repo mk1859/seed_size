@@ -162,6 +162,7 @@ ggplot(plot, aes(log_pval, term_name, fill = source)) +
   scale_fill_tableau()
 ```  
  <img src="https://github.com/mk1859/seed_size/blob/main/images/go_small.jpeg" width=30% height=30%> 
+ 
 ``` R
 # genes upregulated in large seeds
 plot <- gost(query = rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange < 0),]),
