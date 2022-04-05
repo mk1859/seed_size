@@ -197,4 +197,36 @@ ggplot(plot, aes(size, gene, fill = exp)) +
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/heatmap.jpeg" width=30% height=30%>  
 
+``` R
+# we noticed that genes differentially expressed between small and large seeds 
+# are similar to genes underlying germination competence index from our previous work (REF)  
+germ_genes <- read.csv("D:/drop/Dropbox/nowe_polecenia/size/germ_genes_timecourse.txt",header=T, sep = "\t", dec =".")
 
+# we repaeated gene expression scalling for the genes included in germination index
+norm_genes <- counts(dds, normalized = TRUE)
+norm_genes <- norm_genes [which(rownames(norm_genes)%in% germ_genes$gene),]
+norm_genes <- as.data.frame(scale(t(norm_genes)))
+norm_genes$condition <- as.factor(substr(rownames(norm_genes),1,1))
+norm_genes <- as.data.frame(t(apply (norm_genes [,-ncol(norm_genes)], 2, function (x) {
+  tapply (x, norm_genes$condition, mean)})))
+
+norm_genes <- norm_genes %>%
+  mutate (.,gene = rownames(norm_genes)) %>%
+  pivot_longer(., cols = L:S, names_to = "size", values_to = "exp") %>%
+  merge (.,germ_genes, by= "gene")
+
+norm_genes$size <- factor(norm_genes$size, levels = c("S", "M", "L"))
+norm_genes$gene.groups <- factor(norm_genes$gene.groups, levels = c("2", "1"))
+
+# we ploted expression of these genes in small, medium and large seeds
+ggplot(norm_genes, aes(size, exp, color = as.factor(size))) +
+  geom_boxplot (size = 2) +
+  facet_wrap(~ gene.groups, nrow = 1)+ 
+  theme_classic() + 
+  theme(legend.position = "none",
+        strip.background = element_blank(),
+        strip.text.x = element_blank()) + 
+  scale_color_manual(values=c("#E15759","#F28E2B", "#4E79A7"))
+``` 
+
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_germ.jpeg" width=30% height=30%>  
