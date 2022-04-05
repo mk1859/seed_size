@@ -8,13 +8,14 @@ library (tidyverse)
 library (ggthemes)
 library (eulerr)
 library (gprofiler2)
-
-
+library (Seurat)
+library (sctransform)
+library (VISION)
 
 library (ggbeeswarm)
 library (viridis)
-library (sctransform)
-library (Seurat)
+
+
 library (rlist)
 library (cowplot)
 library (patchwork)
@@ -26,8 +27,7 @@ library (graph)
 library (RBGL)
 library (data.table)
 
-library (DESeq2)
-library (VISION)
+
 library (org.At.tair.db)
 library (biomaRt)
 library (GO.db)
@@ -179,17 +179,22 @@ ggplot(plot, aes(log_pval, term_name, fill = source)) +
  <img src="https://github.com/mk1859/seed_size/blob/main/images/go_large.jpeg" width=30% height=30%>  
   
 ``` R
-deg_rnaseq <- as.data.frame(results(dds, alpha = 0.05, contrast= c("genotype","dog1","Col0")))
+# among affected genes we found a group with important function in seed biology
+intresting_genes <- read.csv("D:/drop/Dropbox/nowe_polecenia/size/intresting_genes.txt",header=T, sep = "\t", dec =".")
 
-# Volcano plot
-ggplot(deg_dry_dog1 , aes(y=-log10(padj), x= log2FoldChange, color = padj < 0.05 , alpha = padj < 0.05)) +
-  geom_point(size = 1) + 
-  scale_color_tableau() +
+plot <- norm_genes [which(norm_genes$gene %in% intresting_genes$gene),]
+
+set_order <- plot$gene [order(plot$size,plot$exp)]
+set_order <- set_order [!duplicated(set_order)]
+
+plot$gene <- factor(plot$gene, level = set_order)
+
+ggplot(plot, aes(size, gene, fill = exp)) +
+  geom_tile () +
   theme_classic() +
-  scale_alpha_ordinal(range = c(0.1, 1))
-  
-
+  scale_fill_gradient2(midpoint=0, high="#4E79A7", mid="white",
+                       low="#E15759", space ="Lab")
 ```
-
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/heatmap.jpeg" width=30% height=30%>  
 
 
