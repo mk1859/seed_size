@@ -87,7 +87,7 @@ ggplot(plot , aes(x=PC1, y=PC2, color = size, label = replica)) +
   geom_text(size=8, hjust=-.25, vjust=-.25) + 
   guides(label = FALSE)
 ```
-<img src="https://github.com/mk1859/seed_size/blob/main/images/pca_rnaseq.png" width=33% height=33%>
+<img src="https://github.com/mk1859/seed_size/blob/main/images/pca_rnaseq.jpeg" width=33% height=33%>
 
 
 ``` R
