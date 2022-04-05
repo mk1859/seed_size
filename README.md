@@ -89,9 +89,59 @@ ggplot(plot , aes(x=PC1, y=PC2, color = size, label = replica)) +
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_rnaseq.jpeg" width=33% height=33%>
 
-
 ``` R
-deg_dry_dog1 <- as.data.frame(results(dds, alpha = 0.05, contrast= c("genotype","dog1","Col0")))
+# identify affected genes in pairwise comparisons
+
+deg_rnaseq <- list (SvL = results(dds, alpha = 0.05, contrast= c("size","S","L")),
+                    SvM = results(dds, alpha = 0.05, contrast= c("size","S","M")),
+                    MvL = results(dds, alpha = 0.05, contrast= c("size","M","L")))
+ 
+# select affected genes for small vs large seeds comparison
+affected_genes <- rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < 0.05),])
+
+# export normalized gene counts and filter for affected genes
+norm_genes <- counts(dds, normalized = TRUE)
+norm_genes <- norm_genes [which(rownames(norm_genes)%in% affected_genes),]
+
+# scale gene expression
+norm_genes <- as.data.frame(scale(t(norm_genes)))
+
+# add seed size as column
+norm_genes$condition <- as.factor(substr(rownames(norm_genes),1,1))
+
+# calculate mean expression for replicas
+norm_genes <- as.data.frame(t(apply (norm_genes [,-ncol(norm_genes)], 2, function (x) {
+  tapply (x, norm_genes$condition, mean)})))
+  
+# cluster genes
+gene_clusters <- norm_genes %>% 
+  dist(.) %>%
+  hclust(., method = "complete") %>%
+  cutree(., k = 2) %>%
+  enframe(., name = "gene", value = "cluster")
+
+# create data frame for plotting
+norm_genes <- norm_genes %>%
+  mutate (.,gene = rownames(norm_genes)) %>%
+  pivot_longer(., cols = L:S, names_to = "size", values_to = "exp") %>%
+  merge (.,gene_clusters, by= "gene") 
+norm_genes$size <- factor(norm_genes$size, levels = c("S", "M", "L"))
+
+ggplot(norm_genes, aes(size, exp, color = as.factor(cluster))) +
+  geom_line(aes(group = gene), alpha = 0.3) +
+  facet_wrap(~ cluster, nrow = 1)+ 
+  theme_classic() + 
+  theme(legend.position = "none",
+        strip.background = element_blank(),
+        strip.text.x = element_blank()) + 
+  scale_color_manual(values=c("#E15759", "#4E79A7"))
+ ```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/cluster_genes.jpeg" width=70% height=70%>
+ 
+ ``` R
+  
+
+deg_rnaseq <- as.data.frame(results(dds, alpha = 0.05, contrast= c("genotype","dog1","Col0")))
 
 # Volcano plot
 ggplot(deg_dry_dog1 , aes(y=-log10(padj), x= log2FoldChange, color = padj < 0.05 , alpha = padj < 0.05)) +
@@ -99,6 +149,25 @@ ggplot(deg_dry_dog1 , aes(y=-log10(padj), x= log2FoldChange, color = padj < 0.05
   scale_color_tableau() +
   theme_classic() +
   scale_alpha_ordinal(range = c(0.1, 1))
+  
+  
+  
+res <- results(dds, alpha = 0.05, contrast= c("size","S","L"))
+length(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),2])
+nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
+write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/SvL.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
+
+
+res <- results(dds, alpha = 0.05, contrast= c("size","S","M"))
+nrow(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),])
+nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
+write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/SvM.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
+
+res <- results(dds, alpha = 0.05, contrast= c("size","M","L"))
+nrow(res [which(res$padj < 0.05 & res$log2FoldChange > log(1.5)),])
+nrow(res [which(res$padj < 0.05 & res$log2FoldChange < -log(1.5)),])
+write.table (res,"D:/drop/Dropbox/nowe_polecenia/size/MvL.txt", sep = "\t", col.names = T, row.names = T, quote = FALSE)
+
 ```
 
 
