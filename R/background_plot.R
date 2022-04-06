@@ -1,5 +1,4 @@
-#function to create boxplot, takes also order of time points as input
-background_plot <- function(matrix, order, background) {
+background_plot <- function(matrix, order, background, tableu = "Green-Orange-Teal") {
  # data frame with statistics per seed
   seed_attr <- data.frame(n_reads = colSums(matrix), # number of reads
                           background = background, # fraction of background
@@ -13,8 +12,8 @@ background_plot <- function(matrix, order, background) {
   # boxplot for  fraction of background
   g <- ggplot(seed_attr, aes(x=timepoint, y=background, color = timepoint)) +
    geom_boxplot() + 
-   scale_color_tableau("Green-Orange-Teal") +
+   scale_color_tableau(tableu) +
    theme_classic() 
-  
+
   return (g)
 }
