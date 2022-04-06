@@ -14,21 +14,17 @@ library (VISION)
 library (cowplot)
 library (patchwork)
 library (viridis)
+library (scran)
+library (scater)
+library (graph)
+library (RBGL)
 
 library (ggbeeswarm)
 
 library (rlist)
 
-library (rrvgo)
-library (scran)
-library (scater)
-library (graph)
-library (RBGL)
 library (data.table)
 
-library (org.At.tair.db)
-library (biomaRt)
-library (GO.db)
 library (scales)
 library (matrixStats)
 library (UpSetR)
@@ -434,7 +430,7 @@ deg_both <- deg_list (seurat_both,
 # plot number of affected genes using another function.
 deg_plot (deg_both, direction = TRUE)
 ```
-<img src="https://github.com/mk1859/seed_size/blob/main/images/degs_single.jpeg" width=30% height=30%>
+<img src="https://github.com/mk1859/seed_size/blob/main/images/degs_single.jpeg" width=60% height=60%>
 
 ``` R
 # we created Venn diagrams to show overlaps between identified genes.
@@ -459,9 +455,34 @@ plot(euler(plot[c(3,4,7,8)]), quantities = TRUE)
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/venn_7d24h.jpeg" width=30% height=30%>
 
+Finally, we also identified co-expressed gene groups using the coexpressed function. It calculates pairwise gene expression correlations and filters them. Next, it creates a graph object, looks for highly connected groups in it and outputs groups with gene numbers above the set threshold.
 
+``` R
+clusters <- coexpressed (seurat_both, threshold = 0.5, n_gene = 10)
+               
+lengths (clusters)
+```
+```
+cluster_1 cluster_2 cluster_3 cluster_4 cluster_5 
+      266       123        74        36        13
+```
 
+Identified co-expressed gene groups were used to create signatures that were plotted on PCA maps.
 
+time-course experiment
+``` R
+seurat_both <- AddModuleScore(seurat_both, features = clusters, name = "cluster_")
+
+# we use function to plot signatures
+signature_map (seurat_timecourse, signature = "cluster_1", order = timepoints, column = "timepoint")
+
+signature_map (seurat_timecourse, signature = "cluster_2", order = timepoints, column = "timepoint")
+
+signature_map (seurat_timecourse, signature = "cluster_3", order = timepoints, column = "timepoint")
+
+signature_map (seurat_timecourse, signature = "cluster_4", order = timepoints, column = "timepoint")
+
+```
 
 
 
