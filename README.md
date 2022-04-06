@@ -18,8 +18,6 @@ library (viridis)
 library (ggbeeswarm)
 
 library (rlist)
-library (cowplot)
-library (patchwork)
 
 library (rrvgo)
 library (scran)
@@ -309,12 +307,25 @@ nrow (filtered_size) # genes remaining
 ```
 
 After we obtained filtered matrices of counts, we created Seurat objects with sctransform normalization. To do this, we prepared a wrapper function that takes the count matrix and extracts information about seeds from their names.
-
 ``` R
 seurat_size <- seurat_object (filtered_size, background = background_size)
 ```
 
-
+We calculated PCA during the preparation of Seurat objects. Now, we plotted it to show treatments with the pca_discrete function.
+This function exports dimension reduction and metadata from the Seurat object. It is possible to choose color pallet from ggthemes.
+``` R
+pca_discrete (seurat_size, "timepoint", order = order_lib)
+```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size.jpeg" width=30% height=30%> 
+ 
+ Some technical parameters like number of reads, number of identified genes and fraction of background reads may affect the position of seeds on the PCA plot.
+To check continuous values on PCA plots we wrote another plotting function.
+``` R
+pca_continuous (seurat_size, column = "log10_reads")
+pca_continuous (seurat_size, column = "n_gene")
+pca_continuous (seurat_size, column = "background")
+```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_reads.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_genes.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_background.jpeg" width=30% height=30%> 
 
 After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First we need to repeat all filtering steps on combined matrix of counts.
  
