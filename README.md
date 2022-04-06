@@ -63,7 +63,7 @@ Data for the single seed size experiment.
 data_size <- import_counts ("/matrix/size/", header = TRUE)
 ```
 
-## seed size 3'RNA-seq analysis
+# seed size 3'RNA-seq analysis
 
 We sequenced mRNAs isolated from dry seeds divided accroding to their sizes.
 We identified DEGs using DESeq2.
@@ -232,7 +232,7 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(size))) +
 ``` 
  <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_germ.jpeg" width=30% height=30%> 
  
-## single seed RNA-seq
+# single seed RNA-seq
 
 Quality control of Col-0 and *dog1-4* experiment was performed earlier (REF and https://github.com/mk1859/single_seed).
 Here we start with quality controls for small large seeds experiment.
@@ -254,7 +254,7 @@ head (Araport)
 6 AT1G01060 protein_coding
 ```
  
-# Pre-filtering single seed data
+## Pre-filtering single seed data
 
 Similarly to single-cell experiments, our count data is sparse. We needed to clean it by:
 1) removing of non-protein-coding genes
