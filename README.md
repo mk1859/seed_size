@@ -463,27 +463,26 @@ clusters <- coexpressed (seurat_both, threshold = 0.5, n_gene = 10)
 lengths (clusters)
 ```
 ```
-cluster_1 cluster_2 cluster_3 cluster_4 cluster_5 
-      266       123        74        36        13
+cluster_1 cluster_2 cluster_3 cluster_4 
+      492       146        41        23 
 ```
 
 Identified co-expressed gene groups were used to create signatures that were plotted on PCA maps.
 
-time-course experiment
 ``` R
 seurat_both <- AddModuleScore(seurat_both, features = clusters, name = "cluster_")
 
 # we use function to plot signatures
-signature_map (seurat_timecourse, signature = "cluster_1", order = timepoints, column = "timepoint")
+signature_map (seurat_both, signature = "cluster_1", order = order_lib, column = "timepoint")
 
-signature_map (seurat_timecourse, signature = "cluster_2", order = timepoints, column = "timepoint")
+signature_map (seurat_both, signature = "cluster_2", order = order_lib, column = "timepoint")
 
-signature_map (seurat_timecourse, signature = "cluster_3", order = timepoints, column = "timepoint")
+signature_map (seurat_both, signature = "cluster_3", order = order_lib, column = "timepoint")
 
-signature_map (seurat_timecourse, signature = "cluster_4", order = timepoints, column = "timepoint")
+signature_map (seurat_both, signature = "cluster_4", order = order_lib, column = "timepoint")
 
 ```
-
+<img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust1.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust2.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust3.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust4.jpeg" width=20% height=20%>
 
 
 
