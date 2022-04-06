@@ -98,9 +98,11 @@ deg_rnaseq <- list (SvL = results(dds, alpha = 0.05, contrast= c("size","S","L")
                     MvL = results(dds, alpha = 0.05, contrast= c("size","M","L")))
                     
 # plot overlaps between affected genes
+plot <- lapply (deg_rnaseq, function(x) rownames(x [which(x$padj < 0.05),]))
 
+plot(euler(plot), quantities = TRUE, fill = c("#0073C2FF", "#EFC000FF","#E15759"))
 ```   
-
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/venn_degs.jpeg" width=30% height=30%>
 
 ``` R
 # select affected genes for small vs large seeds comparison
