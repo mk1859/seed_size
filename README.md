@@ -342,7 +342,7 @@ order_lib <- c ("SD_small_3d","SD_small_7d24h","SD_large_3d","SD_large_7d24h",
                 
 pca_discrete (seurat_both, "timepoint", order = order_lib)
 ```
- <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_both.jpeg" width=40% height=40>
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_both.jpeg" width=40% height=40%>
       
       
       
