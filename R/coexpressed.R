@@ -11,7 +11,7 @@ coexpressed <- function (seurat_obj,
                           threshold,             # filtering significant correlation
                           sat=1,                 # parameter for highlyConnSG
                           ldv=c(80,40,20,10),    # parameter for highlyConnSG
-                          n_genes=10) {          # minimal number of genes in identified groups
+                          n_gene=10) {           # minimal number of genes in identified groups
                           
   require (scran)
   require (scater)
