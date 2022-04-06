@@ -422,6 +422,43 @@ go_plot (both_cluster$gene [which(both_cluster$cluster == 2)], background_genes)
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/cluster2.jpeg" width=10% height=10%>
 
+Most direct way to identify genes affected by size and *dog1-4* mutation is DGE analysis. 
+To do that we created a wrapper function to Seurat FindMarkers.
+
+``` R
+deg_both <- deg_list (seurat_both, 
+                      vector1 = c ("SD_small_3d","SD_small_7d24h", "SD_Col0_3d","SD_Col0_7d24h"), 
+                      vector2 = c ("SD_large_3d","SD_large_7d24h", "SD_dog1_3d","SD_dog1_7d24h"), 
+                      column = "timepoint", padj = 0.05, log2FC_threshold = log2(1.2))
+                      
+# plot number of affected genes using another function.
+deg_plot (deg_both, direction = TRUE)
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/degs_single.jpeg" width=30% height=30%>
+
+``` R
+# we created Venn diagrams to show overlaps between identified genes.
+plot <- list(large_3d = rownames(deg_both [[1]] [which(deg_both [[1]]$avg_log2FC > 0),]), 
+             small_3d = rownames(deg_both [[1]] [which(deg_both [[1]]$avg_log2FC < 0),]),
+             large_7d24h = rownames(deg_both [[2]] [which(deg_both [[2]]$avg_log2FC > 0),]), 
+             small_7d24h = rownames(deg_both [[2]] [which(deg_both [[2]]$avg_log2FC < 0),]),
+             dog_3d = rownames(deg_both [[3]] [which(deg_both [[3]]$avg_log2FC > 0),]), 
+             col_3d = rownames(deg_both [[3]] [which(deg_both [[3]]$avg_log2FC < 0),]),
+             dog_7d24h = rownames(deg_both [[4]] [which(deg_both [[4]]$avg_log2FC > 0),]), 
+             col_7d24h = rownames(deg_both [[4]] [which(deg_both [[4]]$avg_log2FC < 0),]))
+
+# 3d
+plot(euler(plot[c(1,2,5,6)]), quantities = TRUE)
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/venn_3d.jpeg" width=30% height=30%>
+
+``` R
+# 7d+24h
+plot(euler(plot[c(3,4,7,8)]), quantities = TRUE)
+
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/venn_7d24h.jpeg" width=30% height=30%>
+
 
 
 
