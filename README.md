@@ -344,5 +344,88 @@ pca_discrete (seurat_both, "timepoint", order = order_lib)
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_both.jpeg" width=40% height=40%>
       
-      
-      
+To better visulise seeds' grouping, we performed tSNE transformation.
+``` R
+seurat_both <- RunTSNE(object = seurat_both, dims = 1:15, verbose = FALSE, perplexity = 40, 
+                       theta =0, max_iter = 10000)
+
+# customize tSNE plot
+plot <- cbind (as.data.frame (Embeddings(object = seurat_both, reduction = "tsne")), 
+               seurat_both@meta.data)
+
+plot$timepoint <- factor(plot$timepoint, levels = order_time)
+
+ggplot(plot, aes(x=tSNE_1, y= tSNE_2, color = timepoint)) +
+  geom_point (size = 2) + 
+  scale_color_tableau("Green-Orange-Teal") +
+  theme_classic() +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank())
+```    
+<img src="https://github.com/mk1859/seed_size/blob/main/images/tsne.jpeg" width=40% height=40%>
+
+## Gene expression patterns
+
+To expain gene expression patterns underlying seed positios on PCA mapwe performed several analysis.
+First we clustered seeds and identified genes differentilly expressed between seed clusters.
+``` R
+seurat_both <- FindNeighbors(object = seurat_both, dims = 1:15, verbose = FALSE)
+
+seurat_both <- FindClusters(object = seurat_both, verbose = FALSE, resolution = 0.2)
+
+both_cluster <- FindAllMarkers(object = seurat_both, 
+                                logfc.threshold = log2(1.5), test.use = "wilcox",only.pos =TRUE, 
+                                assay = "SCT", slot ="data", verbose = FALSE)
+
+both_cluster <- both_cluster [both_cluster$p_val_adj < .05,]
+
+plot <- cbind (as.data.frame (Embeddings(object = seurat_both, reduction = "pca")) [,1:2], 
+               seurat_both@meta.data)
+
+ggplot(plot, aes(x=PC_1, y= PC_2, color = seurat_clusters)) +
+  geom_point (size = 2) + 
+  scale_color_tableau("Classic 10") +
+  theme_classic() +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank()) +
+  theme(legend.title = element_blank())
+``` 
+<img src="https://github.com/mk1859/seed_size/blob/main/images/seed_clusters.jpeg" width=40% height=40%>
+
+We checked if genes characteristic for seeds' clusters show any enrichment for GO terms
+``` R
+# first set background to genes that passed filtering steps
+background_genes <- rownames(filtered_both)
+
+# cluster 0
+go_plot (both_cluster$gene [which(both_cluster$cluster == 0)], background_genes) 
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/cluster0.jpeg" width=30% height=30%>
+
+``` R
+# cluster 1
+go_plot (both_cluster$gene [which(both_cluster$cluster == 1)], background_genes) 
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/cluster1.jpeg" width=20% height=20%>
+
+``` R
+# cluster 2
+go_plot (both_cluster$gene [which(both_cluster$cluster == 2)], background_genes) 
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/cluster2.jpeg" width=10% height=10%>
+
+
+
+
+
+
+
+
