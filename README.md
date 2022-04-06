@@ -11,6 +11,8 @@ library (gprofiler2)
 library (Seurat)
 library (sctransform)
 library (VISION)
+library (cowplot)
+library (patchwork)
 
 library (ggbeeswarm)
 library (viridis)
@@ -230,5 +232,60 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(size))) +
         strip.text.x = element_blank()) + 
   scale_color_manual(values=c("#E15759","#F28E2B", "#4E79A7"))
 ``` 
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_germ.jpeg" width=30% height=30%> 
+ 
+## single seed RNA-seq
 
- <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_germ.jpeg" width=30% height=30%>  
+Quality control of Col-0 and *dog1-4* experiment was performed earlier (REF and https://github.com/mk1859/single_seed).
+Here we start with quality controls for small large seeds experiment.
+
+First, we need a refernce file as our library preparation protocol was designed to detect mRNAs. To filter out non-protein-coding genes we needed a reference file with information about gene types.
+
+``` R
+Araport <- read.csv ("Araport.txt", sep = "\t", header = TRUE)
+
+head (Araport)
+```
+```
+       gene           type
+1 AT1G01010 protein_coding
+2 AT1G01020 protein_coding
+3 AT1G01030 protein_coding
+4 AT1G01040 protein_coding
+5 AT1G01050 protein_coding
+6 AT1G01060 protein_coding
+```
+ 
+# Pre-filtering single seed data
+
+Similarly to single-cell experiments, our count data is sparse. We needed to clean it by:
+1) removing of non-protein-coding genes
+2) removing of genes encoded in organelles
+3) removing of summary lines at last rows of the count matrix
+4) filtering out genes with a low count number
+5) filtering seeds with not enough reads
+
+To do that we created function prefilter_matrix and applied it to our single seed matrices. By default it uses Araport data frame with columns described as above.
+We require the mean expression of a gene to be at least 1 read per seed for a gene to remain and at least 5,000 reads per seed for a seed to remain.
+
+``` R
+filtered_size <- prefilter_matrix (data_size, mean_exp=1, n_reads=5000)
+
+dim (filtered_size) # genes / seeds remaining
+[1] 11785   382
+```
+We wrote a function to plot the number of sequenced reads and identified genes per seed. We wanted to show treatments in the specified order.
+
+``` R
+order_lib <- c ("SD_small_3d","SD_small_7d24h","SD_large_3d","SD_large_7d24h")
+
+nreads_plot (filtered_size, tableu = "Green-Orange-Teal", order = order_lib)
+```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/nreads.jpeg" width=30% height=30%> 
+
+
+
+
+After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First we need to repeat all filtering steps on combined matrix of counts.
+ 
+ 
