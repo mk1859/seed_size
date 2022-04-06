@@ -488,3 +488,34 @@ sig_vs_sig (seurat_both, "cluster_1", "cluster_2", order = order_lib)
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/clust1_vs_clust2.jpeg" width=30% height=30%>
 
+To combine two signatures with opposing expression we use VISION package.
+``` R
+# effect of seed size
+deg_size <- as.data.frame(deg_rnaseq$SvL) %>% filter (., padj < 0.05)
+size_sign <-  -sign(deg_size$log2FoldChange)
+size_sign <- setNames (size_sign, rownames(deg_size))
+size_sign <- createGeneSignature (name = "size_sign", sigData = size_sign)
+
+# cluster_1 and cluster_2 genes
+germ_sign <- c(rep (1, 492),rep (-1, 146))
+germ_sign <- setNames (germ_sign, c(clusters_both2$cluster_1, clusters_both2$cluster_2))
+germ_sign <- createGeneSignature (name = "germ_sign", sigData = germ_sign)
+vis <- Vision(seurat_both, signatures = list(dog1_sign, size_sign,germ_sign), meta = seurat_both@meta.data, assay = "SCT")
+vis <- analyze(vis)
+
+# signature of seed size
+signature_map (seurat_both, vis_obj = vis, signature = "size_sign", order = order_lib, column = "timepoint")
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/size_sign.jpeg" width=30% height=30%>
+
+``` R
+# signature of seed size
+signature_map (seurat_both, vis_obj = vis, signature = "size_sign", order = order_lib, column = "timepoint")
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/germ_sign.jpeg" width=30% height=30%>
+
+``` R
+# correlation of these two signatures
+sig_vs_sig (seurat_both, "size_sign", "germ_sign", vis_obj = vis, order = order_lib)
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/size_vs_germ.jpeg" width=30% height=30%>
