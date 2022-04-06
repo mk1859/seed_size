@@ -1,6 +1,6 @@
 # function to create Surat object
 
-seurat_object <- function(matrix, background = NULL, include_background=TRUE) {
+seurat_object <- function(matrix, background = NULL, include_background=FALSE) {
   require (Seurat)
   require (sctransform)
   
