@@ -18,16 +18,6 @@ library (scran)
 library (scater)
 library (graph)
 library (RBGL)
-
-library (ggbeeswarm)
-
-library (rlist)
-
-library (data.table)
-
-library (scales)
-library (matrixStats)
-library (UpSetR)
 ```
 
 ## Import the data
