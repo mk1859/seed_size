@@ -146,31 +146,13 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(cluster))) +
 background_genes <- rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$baseMean > 5),])
 
 # genes upregulated in small seeds
-plot <- gost(query = rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange > 0),]),
-             organism = "athaliana", custom_bg = background_genes, user_threshold = 0.05, sources = "GO")$result
-
-plot$log_pval <- -log10(plot$p_value)
-plot$term_name <- factor(plot$term_name, levels = as.factor(plot$term_name [order(c(plot$source, plot$log_pval), decreasing = F)]))
-
-ggplot(plot, aes(log_pval, term_name, fill = source)) +
-  geom_bar(stat="identity", position=position_dodge()) +
-  theme_classic() + 
-  scale_fill_tableau()
+go_plot (rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange > 0),]), background_genes) 
 ```  
  <img src="https://github.com/mk1859/seed_size/blob/main/images/go_small.jpeg" width=30% height=30%> 
  
 ``` R
 # genes upregulated in large seeds
-plot <- gost(query = rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange < 0),]),
-             organism = "athaliana", custom_bg = background_genes, user_threshold = 0.05, sources = "GO")$result
-
-plot$log_pval <- -log10(plot$p_value)
-plot$term_name <- factor(plot$term_name, levels = as.factor(plot$term_name [order(c(plot$source, plot$log_pval), decreasing = F)]))
-
-ggplot(plot, aes(log_pval, term_name, fill = source)) +
-  geom_bar(stat="identity", position=position_dodge()) +
-  theme_classic() + 
-  scale_fill_tableau()
+go_plot (rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$SvL$log2FoldChange < 0),]), background_genes) 
 ``` 
  <img src="https://github.com/mk1859/seed_size/blob/main/images/go_large.jpeg" width=30% height=30%>  
   
@@ -281,14 +263,14 @@ As visible on the plot above, our libraries vary in the number of identified gen
 We counted the fraction of off-target reads (not in protein-coding genes) for each seed with the background_reads function which uses raw and pre-filtered matrices as input.
 
 ``` R
-background_timecourse <- background_reads (data_size, filtered_size)
+background_size <- background_reads (data_size, filtered_size)
 
 # function to boxplot fraction of background reads
 background_plot (filtered_size, order = order_lib, background = background_size)
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_background.jpeg" width=30% height=30%> 
  
- The abundance of background reads may imply that some counts attributed to genes may not reflect their expression.
+The abundance of background reads may imply that some counts attributed to genes may not reflect their expression.
 Closer examination of read tracks in the browser showed that the distribution of background reads is not random and they tend to create hot spots laying both between genes and partially overlapping with them. In addition, the strength of genic peaks is negatively correlated with the number of background reads.
 Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do that we wrote the function called correlation_table.
 
@@ -484,5 +466,25 @@ signature_map (seurat_both, signature = "cluster_4", order = order_lib, column =
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust1.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust2.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust3.jpeg" width=20% height=20%> <img src="https://github.com/mk1859/seed_size/blob/main/images/sig_clust4.jpeg" width=20% height=20%>
 
+We observe specific GO terms enrichment for two clusters.
+``` R
+# first set background to genes that passed filtering steps
+background_genes <- rownames(filtered_both)
 
+# cluster_1
+go_plot (clusters$cluster_1, background_genes) 
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/go_cluster1.jpeg" width=10% height=10%>
+
+``` R
+# cluster_4
+go_plot (clusters$cluster_4, background_genes) 
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/go_cluster4.jpeg" width=30% height=30%>
+
+We observed that cluster_1 and cluster_2 expression are anticorelated
+``` R
+sig_vs_sig (seurat_both, "cluster_1", "cluster_2", order = order_lib)
+```
+<img src="https://github.com/mk1859/seed_size/blob/main/images/clust1_vs_clust2.jpeg" width=30% height=30%>
 
