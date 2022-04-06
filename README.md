@@ -13,10 +13,9 @@ library (sctransform)
 library (VISION)
 library (cowplot)
 library (patchwork)
-
-library (ggbeeswarm)
 library (viridis)
 
+library (ggbeeswarm)
 
 library (rlist)
 library (cowplot)
@@ -28,7 +27,6 @@ library (scater)
 library (graph)
 library (RBGL)
 library (data.table)
-
 
 library (org.At.tair.db)
 library (biomaRt)
@@ -272,6 +270,8 @@ We require the mean expression of a gene to be at least 1 read per seed for a ge
 filtered_size <- prefilter_matrix (data_size, mean_exp=1, n_reads=5000)
 
 dim (filtered_size) # genes / seeds remaining
+```
+```
 [1] 11785   382
 ```
 We wrote a function to plot the number of sequenced reads and identified genes per seed. We wanted to show treatments in the specified order.
@@ -283,6 +283,36 @@ nreads_plot (filtered_size, tableu = "Green-Orange-Teal", order = order_lib)
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/nreads.jpeg" width=30% height=30%> 
 
+As visible on the plot above, our libraries vary in the number of identified genic reads. One source of this may be the different quality of sequenced libraries reflected by the ratio of target and off-target reads.
+We counted the fraction of off-target reads (not in protein-coding genes) for each seed with the background_reads function which uses raw and pre-filtered matrices as input.
+
+``` R
+background_timecourse <- background_reads (data_size, filtered_size)
+
+# function to boxplot fraction of background reads
+background_plot (filtered_size, order = order_lib, background = background_size)
+```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_background.jpeg" width=30% height=30%> 
+ 
+ The abundance of background reads may imply that some counts attributed to genes may not reflect their expression.
+Closer examination of read tracks in the browser showed that the distribution of background reads is not random and they tend to create hot spots laying both between genes and partially overlapping with them. In addition, the strength of genic peaks is negatively correlated with the number of background reads.
+Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do that we wrote the function called correlation_table.
+
+``` R
+correlation_size <- correlation_table (filtered_tsize, background_size)
+
+filtered_size <- filtered_size [-which (rowMaxs (correlation_size) > 0.3),]
+nrow (filtered_size) # genes remaining
+```
+```
+[1] 7287
+```
+
+After we obtained filtered matrices of counts, we created Seurat objects with sctransform normalization. To do this, we prepared a wrapper function that takes the count matrix and extracts information about seeds from their names.
+
+``` R
+seurat_size <- seurat_object (filtered_size, background = background_size)
+```
 
 
 
