@@ -297,7 +297,7 @@ Closer examination of read tracks in the browser showed that the distribution of
 Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do that we wrote the function called correlation_table.
 
 ``` R
-correlation_size <- correlation_table (filtered_tsize, background_size)
+correlation_size <- correlation_table (filtered_size, background_size)
 
 filtered_size <- filtered_size [-which (rowMaxs (correlation_size) > 0.3),]
 nrow (filtered_size) # genes remaining
@@ -316,7 +316,7 @@ This function exports dimension reduction and metadata from the Seurat object. I
 ``` R
 pca_discrete (seurat_size, "timepoint", order = order_lib)
 ```
- <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size.jpeg" width=30% height=30%> 
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size.jpeg" width=40% height=40%> 
  
  Some technical parameters like number of reads, number of identified genes and fraction of background reads may affect the position of seeds on the PCA plot.
 To check continuous values on PCA plots we wrote another plotting function.
@@ -327,6 +327,22 @@ pca_continuous (seurat_size, column = "background")
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_reads.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_genes.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_background.jpeg" width=30% height=30%> 
 
-After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First we need to repeat all filtering steps on combined matrix of counts.
+After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First we need to repeat all filtering steps on combined matrix of counts and then create Seurat object.
  
- 
+ ``` R
+data_both <- cbind (data_size, data_dog1)
+filtered_both <- prefilter_matrix (data_both, mean_exp=1, n_reads=5000)
+background_both <- background_reads (data_both, filtered_both)
+correlation_both <- correlation_table (filtered_both, background_both)
+filtered_both <- filtered_both [-which (rowMaxs (correlation_both) > 0.3),]
+seurat_both <- seurat_object (filtered_both, background = background_both)
+
+order_lib <- c ("SD_small_3d","SD_small_7d24h","SD_large_3d","SD_large_7d24h", 
+                "SD_dog1_3d","SD_dog1_7d24h","SD_Col0_3d","SD_Col0_7d24h")
+                
+pca_discrete (seurat_both, "timepoint", order = order_lib)
+```
+ <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_both.jpeg" width=40% height=40>
+      
+      
+      
