@@ -24,7 +24,7 @@ library (RBGL)
 ## Import the data
 
 On GEO we deposited results of three different NGS experiments. 
-1) 3'RNA-seq results for the analysis of Col-0 dry seed pools divided according to the size into small (S), medium (M) and large (L) seeds (4 biological replicas). Here we provide read counts as single file.
+1) 3'RNA-seq results for the analysis of Col-0 dry seed pools divided according to the size into small (S), medium (M) and large (L) seeds (4 biological replicas). Here we provide read counts as a single file.
 
 ``` R
 rnaseq_size <- read.csv("/seed_size.tsv", header=T, sep = "\t")
@@ -34,7 +34,7 @@ rnaseq_size <- read.csv("/seed_size.tsv", header=T, sep = "\t")
    Each of the four treatments (genotype + time point) consist of 3 libraries. We provide a matrix of read counts for each library in which rows are genes and columns are one of 32 seeds used for library preparation.
 
 3) single seed RNA-seq for Col-0 small and large seeds in two time points of secondary dormancy induction. 
-   Seeds treatment and libraries preparation for that analysis were performed along the experiment from previous point.
+   Seeds treatment and libraries preparation for that analysis were performed along with the experiment from the previous point.
 
 We created the function called import_counts to upload the data and combine matrices into a single matrix.
 
@@ -50,7 +50,7 @@ data_size <- import_counts ("/matrix/size/", header = TRUE)
 
 # seed size 3'RNA-seq analysis
 
-We sequenced mRNAs isolated from dry seeds divided accroding to their sizes.
+We sequenced mRNAs isolated from dry seeds divided according to their sizes.
 We identified DEGs using DESeq2.
 
 ``` R
@@ -201,9 +201,9 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(size))) +
 # single seed RNA-seq
 
 Quality control of Col-0 and *dog1-4* experiment was performed earlier (REF and https://github.com/mk1859/single_seed).
-Here we start with quality controls for small large seeds experiment.
+Here we start with quality controls for smal/large seeds experiment.
 
-First, we need a refernce file as our library preparation protocol was designed to detect mRNAs. To filter out non-protein-coding genes we needed a reference file with information about gene types.
+First, we need a reference file as our library preparation protocol was designed to detect mRNAs. To filter out non-protein-coding genes we needed a reference file with information about gene types.
 
 ``` R
 Araport <- read.csv ("Araport.txt", sep = "\t", header = TRUE)
