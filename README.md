@@ -8,6 +8,7 @@ library (tidyverse)
 library (ggthemes)
 library (eulerr)
 library (gprofiler2)
+library (rlist)
 library (Seurat)
 library (sctransform)
 library (VISION)
@@ -104,7 +105,7 @@ norm_genes$condition <- as.factor(substr(rownames(norm_genes),1,1))
 
 # calculate mean expression for replicas
 norm_genes <- as.data.frame(t(apply (norm_genes [,-ncol(norm_genes)], 2, function (x) {
-  tapply (x, norm_genes$condition, mean)})))
+                               tapply (x, norm_genes$condition, mean)})))
   
 # cluster genes
 gene_clusters <- norm_genes %>% 
@@ -148,7 +149,7 @@ go_plot (rownames(deg_rnaseq$SvL [which(deg_rnaseq$SvL$padj < .05 &deg_rnaseq$Sv
   
 ``` R
 # among affected genes we found a group with important function in seed biology
-intresting_genes <- read.csv("D:/drop/Dropbox/nowe_polecenia/size/intresting_genes.txt",header=T, sep = "\t", dec =".")
+intresting_genes <- read.csv("/size/intresting_genes.txt",header=T, sep = "\t", dec =".")
 
 plot <- norm_genes [which(norm_genes$gene %in% intresting_genes$gene),]
 
@@ -160,15 +161,14 @@ plot$gene <- factor(plot$gene, level = set_order)
 ggplot(plot, aes(size, gene, fill = exp)) +
   geom_tile () +
   theme_classic() +
-  scale_fill_gradient2(midpoint=0, high="#4E79A7", mid="white",
-                       low="#E15759", space ="Lab")
+  scale_fill_gradient2(midpoint=0, high="#4E79A7", mid="white", low="#E15759", space ="Lab")
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/heatmap.jpeg" width=30% height=30%>  
 
 ``` R
 # we noticed that genes differentially expressed between small and large seeds 
 # are similar to genes underlying germination competence index from our previous work (REF)  
-germ_genes <- read.csv("D:/drop/Dropbox/nowe_polecenia/size/germ_genes_timecourse.txt",header=T, sep = "\t", dec =".")
+germ_genes <- read.csv("/size/germ_genes_timecourse.txt",header=T, sep = "\t", dec =".")
 
 # we repaeated gene expression scalling for the genes included in germination index
 norm_genes <- counts(dds, normalized = TRUE)
