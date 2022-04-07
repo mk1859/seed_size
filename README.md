@@ -223,13 +223,13 @@ head (Araport)
 ## Pre-filtering single seed data
 
 Similarly to single-cell experiments, our count data is sparse. We needed to clean it by:
-1) removing of non-protein-coding genes
+1) removing non-protein-coding genes
 2) removing of genes encoded in organelles
-3) removing of summary lines at last rows of the count matrix
+3) removing summary lines at the last rows of the count matrix
 4) filtering out genes with a low count number
 5) filtering seeds with not enough reads
 
-To do that we created function prefilter_matrix and applied it to our single seed matrices. By default it uses Araport data frame with columns described as above.
+To do that we created the function prefilter_matrix and applied it to our single seed matrices. By default, it uses Araport data frame with columns described above.
 We require the mean expression of a gene to be at least 1 read per seed for a gene to remain and at least 5,000 reads per seed for a seed to remain.
 
 ``` R
@@ -261,7 +261,7 @@ background_plot (filtered_size, order = order_lib, background = background_size)
  <img src="https://github.com/mk1859/seed_size/blob/main/images/boxplot_background.jpeg" width=30% height=30%> 
  
 The abundance of background reads may imply that some counts attributed to genes may not reflect their expression.
-Closer examination of read tracks in the browser showed that the distribution of background reads is not random and they tend to create hot spots laying both between genes and partially overlapping with them. In addition, the strength of genic peaks is negatively correlated with the number of background reads.
+A closer examination of reads' tracks in the browser showed that the distribution of background reads is not random and they tend to create hot spots laying both between genes and partially overlapping with them. In addition, the strength of genic peaks is negatively correlated with the number of background reads.
 Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do that we wrote the function called correlation_table.
 
 ``` R
@@ -280,13 +280,13 @@ seurat_size <- seurat_object (filtered_size, background = background_size)
 ```
 
 We calculated PCA during the preparation of Seurat objects. Now, we plotted it to show treatments with the pca_discrete function.
-This function exports dimension reduction and metadata from the Seurat object. It is possible to choose color pallet from ggthemes.
+This function exports dimension reduction and metadata from the Seurat object. It is possible to choose a colour pallet from the ggthemes package.
 ``` R
 pca_discrete (seurat_size, "timepoint", order = order_lib)
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size.jpeg" width=40% height=40%> 
  
- Some technical parameters like number of reads, number of identified genes and fraction of background reads may affect the position of seeds on the PCA plot.
+Some technical parameters like number of reads, number of identified genes and fraction of background reads may affect the position of seeds on the PCA plot.
 To check continuous values on PCA plots we wrote another plotting function.
 ``` R
 pca_continuous (seurat_size, column = "log10_reads")
@@ -295,8 +295,7 @@ pca_continuous (seurat_size, column = "background")
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_reads.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_genes.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_background.jpeg" width=30% height=30%> 
 
-After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First we need to repeat all filtering steps on combined matrix of counts and then create Seurat object.
- 
+After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts from both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First, we need to repeat all filtering steps on the combined matrix of counts and then create the Seurat object.
  ``` R
 data_both <- cbind (data_size, data_dog1)
 filtered_both <- prefilter_matrix (data_both, mean_exp=1, n_reads=5000)
@@ -338,8 +337,8 @@ ggplot(plot, aes(x=tSNE_1, y= tSNE_2, color = timepoint)) +
 
 ## Gene expression patterns
 
-To expain gene expression patterns underlying seed positios on PCA mapwe performed several analysis.
-First we clustered seeds and identified genes differentilly expressed between seed clusters.
+To explain gene expression patterns underlying seed positions on the PCA map, we performed a few analyses.
+First, we clustered seeds and identified genes differentially expressed between seed clusters.
 ``` R
 seurat_both <- FindNeighbors(object = seurat_both, dims = 1:15, verbose = FALSE)
 
@@ -390,8 +389,8 @@ go_plot (both_cluster$gene [which(both_cluster$cluster == 2)], background_genes)
 ```
 <img src="https://github.com/mk1859/seed_size/blob/main/images/cluster2.jpeg" width=10% height=10%>
 
-Most direct way to identify genes affected by size and *dog1-4* mutation is DGE analysis. 
-To do that we created a wrapper function to Seurat FindMarkers.
+The most direct way to identify genes affected by the seed size and *dog1-4* mutation is DGE analysis. 
+To do that we created a wrapper function for Seurat FindMarkers.
 
 ``` R
 deg_both <- deg_list (seurat_both, 
