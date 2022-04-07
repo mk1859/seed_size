@@ -2,7 +2,7 @@
 # direction = TRUE divides genes into upregulated and downregulated 
 # limits and by parameters are passed to x-axis properties
 
-deg_plot <- function(deg_list, direction = TRUE, limits = c(-400,800), by = 200) {
+deg_plot <- function(deg_list, direction = TRUE, limits = c(-600,600), by = 200) {
   require(rlist)
   require (ggthemes)
   require (ggplot2)
