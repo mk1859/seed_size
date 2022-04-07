@@ -501,7 +501,7 @@ signature_map (seurat_both, vis_obj = vis, signature = "size_sign", order = orde
 # signature of transcriptional germination competence
 signature_map (seurat_both, vis_obj = vis, signature = "germ_sign", order = order_lib, column = "timepoint")
 ```
-<img src="https://github.com/mk1859/germ_size/blob/main/images/germ_sign.jpeg" width=30% height=30%>
+<img src="https://github.com/mk1859/seed_size/blob/main/images/germ_sign.jpeg" width=30% height=30%>
 
 ``` R
 # correlation of these two signatures
