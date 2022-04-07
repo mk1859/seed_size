@@ -1,4 +1,4 @@
-Here we provide code for the preparation of the NGS figures for analysis of Arabidopsis seed size correlation with seed germination phenotypes.
+Here we provide code for the preparation of the NGS figures for analysis of Arabidopsis seed size correlation with seed transcriptomes.
 
 #### Load required R packages.
 
@@ -203,7 +203,7 @@ ggplot(norm_genes, aes(size, exp, color = as.factor(size))) +
 Quality control of Col-0 and *dog1-4* experiment was performed earlier (REF and https://github.com/mk1859/single_seed).
 Here we start with quality controls for smal/large seeds experiment.
 
-First, we need a reference file as our library preparation protocol was designed to detect mRNAs. To filter out non-protein-coding genes we needed a reference file with information about gene types.
+Our library preparation protocol was designed to detect mRNAs. To filter out non-protein-coding genes we needed a reference file with information about gene types.
 
 ``` R
 Araport <- read.csv ("Araport.txt", sep = "\t", header = TRUE)
@@ -222,7 +222,7 @@ head (Araport)
  
 ## Pre-filtering single seed data
 
-Similarly to single-cell experiments, our count data is sparse. We needed to clean it by:
+Similarly to single-cell experiments, our reads count data is sparse. We needed to clean it by:
 1) removing non-protein-coding genes
 2) removing of genes encoded in organelles
 3) removing summary lines at the last rows of the count matrix
@@ -262,7 +262,7 @@ background_plot (filtered_size, order = order_lib, background = background_size)
  
 The abundance of background reads may imply that some counts attributed to genes may not reflect their expression.
 A closer examination of reads' tracks in the browser showed that the distribution of background reads is not random and they tend to create hot spots laying both between genes and partially overlapping with them. In addition, the strength of genic peaks is negatively correlated with the number of background reads.
-Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do that we wrote the function called correlation_table.
+Based on these observations, we decided to remove from our analysis genes whose read count is strongly positively correlated with the number of background reads. As gene expression patterns are different between treatments, we calculated these correlations for each of them separately as well as for all seeds combined. To do this we wrote the function called correlation_table.
 
 ``` R
 correlation_size <- correlation_table (filtered_size, background_size)
@@ -295,7 +295,7 @@ pca_continuous (seurat_size, column = "background")
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_reads.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_genes.jpeg" width=30% height=30%>  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_size_background.jpeg" width=30% height=30%> 
 
-After we showed that small and large single seed RNA sequencing is high quality, we can combine read counts from both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First, we need to repeat all filtering steps on the combined matrix of counts and then create the Seurat object.
+After we showed that small and large single seed RNA sequencing has high quality, we can combine read counts from both small/large and Col-0/*dog1-4* experiments and performed their analysis together. First, we need to repeat all filtering steps on the combined matrix of counts and then create the Seurat object.
  ``` R
 data_both <- cbind (data_size, data_dog1)
 filtered_both <- prefilter_matrix (data_both, mean_exp=1, n_reads=5000)
@@ -311,7 +311,7 @@ pca_discrete (seurat_both, "timepoint", order = order_lib)
 ```
  <img src="https://github.com/mk1859/seed_size/blob/main/images/pca_both.jpeg" width=40% height=40%>
       
-To better visulise seeds' grouping, we performed tSNE transformation.
+To better visualise seeds' grouping, we performed tSNE transformation.
 ``` R
 seurat_both <- RunTSNE(object = seurat_both, dims = 1:15, verbose = FALSE, perplexity = 40, 
                        theta =0, max_iter = 10000)
@@ -338,7 +338,7 @@ ggplot(plot, aes(x=tSNE_1, y= tSNE_2, color = timepoint)) +
 ## Gene expression patterns
 
 To explain gene expression patterns underlying seed positions on the PCA map, we performed a few analyses.
-First, we clustered seeds and identified genes differentially expressed between seed clusters.
+First, we clustered seeds and identified genes differentially expressed between seeds' clusters.
 ``` R
 seurat_both <- FindNeighbors(object = seurat_both, dims = 1:15, verbose = FALSE)
 
@@ -487,9 +487,9 @@ size_sign <- createGeneSignature (name = "size_sign", sigData = size_sign)
 
 # cluster_1 and cluster_2 genes
 germ_sign <- c(rep (1, 492),rep (-1, 146))
-germ_sign <- setNames (germ_sign, c(clusters_both2$cluster_1, clusters_both2$cluster_2))
+germ_sign <- setNames (germ_sign, c(clusters2$cluster_1, clusters$cluster_2))
 germ_sign <- createGeneSignature (name = "germ_sign", sigData = germ_sign)
-vis <- Vision(seurat_both, signatures = list(dog1_sign, size_sign,germ_sign), meta = seurat_both@meta.data, assay = "SCT")
+vis <- Vision(seurat_both, signatures = list(size_sign,germ_sign), meta = seurat_both@meta.data, assay = "SCT")
 vis <- analyze(vis)
 
 # signature of seed size
@@ -498,10 +498,10 @@ signature_map (seurat_both, vis_obj = vis, signature = "size_sign", order = orde
 <img src="https://github.com/mk1859/seed_size/blob/main/images/size_sign.jpeg" width=30% height=30%>
 
 ``` R
-# signature of seed size
-signature_map (seurat_both, vis_obj = vis, signature = "size_sign", order = order_lib, column = "timepoint")
+# signature of transcriptional germination competence
+signature_map (seurat_both, vis_obj = vis, signature = "germ_sign", order = order_lib, column = "timepoint")
 ```
-<img src="https://github.com/mk1859/seed_size/blob/main/images/germ_sign.jpeg" width=30% height=30%>
+<img src="https://github.com/mk1859/germ_size/blob/main/images/germ_sign.jpeg" width=30% height=30%>
 
 ``` R
 # correlation of these two signatures
