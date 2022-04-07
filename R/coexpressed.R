@@ -36,7 +36,7 @@ coexpressed <- function (seurat_obj,
   # order and filter gene groups
   clusters <- clusters[order(lengths(clusters), decreasing=TRUE)]
   names(clusters) <- paste0("cluster_", seq(1:length(clusters)))
-  clusters <- clusters [lengths(clusters) >= n_genes]
+  clusters <- clusters [lengths(clusters) >= n_gene]
   
   return (clusters)
 }
