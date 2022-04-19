@@ -487,7 +487,7 @@ size_sign <- createGeneSignature (name = "size_sign", sigData = size_sign)
 
 # cluster_1 and cluster_2 genes
 germ_sign <- c(rep (1, 492),rep (-1, 146))
-germ_sign <- setNames (germ_sign, c(clusters2$cluster_1, clusters$cluster_2))
+germ_sign <- setNames (germ_sign, c(clusters$cluster_1, clusters$cluster_2))
 germ_sign <- createGeneSignature (name = "germ_sign", sigData = germ_sign)
 vis <- Vision(seurat_both, signatures = list(size_sign,germ_sign), meta = seurat_both@meta.data, assay = "SCT")
 vis <- analyze(vis)
